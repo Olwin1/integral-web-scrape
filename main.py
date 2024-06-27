@@ -131,6 +131,13 @@ def downloadPdfs(ids):
                 print(f'No PDF link found on page {url}')
         else:
             print(f'No navigation structure found on page {url}')
+            
+sub_pages = get_all_subpages(base_url, session)
+sectionIds = get_sectionids(sub_pages)
+print(f"Downloading from section of the following ids: {sectionIds}")
+for sectionId in sectionIds:
+    downloadPdfs(getPdfIds(2, sectionId))
+print("Done!")
 
 # print([getPdfIds(2, sectionid) for sectionid in get_sectionids(sub_pages)])
 print(get_all_subpages(session))
