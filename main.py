@@ -42,8 +42,7 @@ def get_sectionids(url_results):
     return [int(url.split("sectionid=")[1]) for url in url_results]
 
 
-sub_pages = get_all_subpages(base_url, session)
-print(get_sectionids(sub_pages))
+
 
 # Define the base URL and the initial id
 def getPdfIds(courseId, sectionId):
@@ -122,4 +121,10 @@ def downloadPdfs(ids):
                 print(f'No PDF link found on page {url}')
         else:
             print(f'No navigation structure found on page {url}')
-downloadPdfs(getPdfIds(2, 3))
+            
+sub_pages = get_all_subpages(base_url, session)
+sectionIds = get_sectionids(sub_pages)
+print(f"Downloading from section of the following ids: {sectionIds}")
+for sectionId in sectionIds:
+    downloadPdfs(getPdfIds(2, sectionId))
+print("Done!")
