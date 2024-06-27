@@ -6,6 +6,45 @@ import time
 session = requests.Session()
 session.cookies.set('IntegralSession', 'j2hhe5dltjqu9ffpggpf2n5ru2', domain='my.integralmaths.org')
 
+base_url = 'https://my.integralmaths.org/course/view.php?id=2'
+
+def setup_soup(url, session):
+    response = session.get(url)
+    return BeautifulSoup(response.text, 'html.parser')
+
+# returns a list of all the sections on a page
+def get_sections(soup):
+    return soup.find_all(attrs={"class": "sectionname"})
+
+def extract_pages(soup):
+    return [element.findChildren("a")[0].get("href") for element in get_sections(soup)] 
+
+def extract_subpages(url, session):
+    soup = setup_soup(url, session)
+
+    return [element.findChildren("a")[0].get("href") for element in get_sections(soup)[1:]] # the subpages have a title with no link so first element is skipped 
+    
+def get_all_subpages(base_url, session):
+    soup = setup_soup(base_url, session)
+
+    results = [] # 2D array of all subpages found
+
+    pages = extract_pages(soup)
+    for page_url in pages:
+        results.extend(extract_subpages(page_url, session))
+
+    results.append(pages[0])
+    results.append(pages[-1])
+
+    return list(filter(lambda x: x != [], results)) # prune erronous empty results
+
+def get_sectionids(url_results):
+    return [int(url.split("sectionid=")[1]) for url in url_results]
+
+
+sub_pages = get_all_subpages(base_url, session)
+print(get_sectionids(sub_pages))
+
 # Define the base URL and the initial id
 def getPdfIds(courseId, sectionId):
     base_url = f'https://my.integralmaths.org/course/view.php?id={courseId}&sectionid={sectionId}'
