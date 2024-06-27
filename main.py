@@ -15,15 +15,15 @@ def getPdfIds(courseId, sectionId):
     divs = soup.find_all("div", {"class": "activityinstance"})
     links = []
     for div in divs:
-        pdf_link = os.path.basename(div.find('a')["href"])
-        if "view.php?id=" in pdf_link:
+        pdf_link = div.find('a')["href"]
+        if "resource/view.php?id=" in pdf_link:
             links.append(pdf_link.split("?id=", 1)[1])
-    print(links)
+    return links
 
-getPdfIds(2, 3)
 
 
 def downloadPdfs(ids):
+    print(f"Dowloading Pdfs of ids: {ids}")
     # Define the base URL and the initial id
     base_url = 'https://my.integralmaths.org/mod/resource/view.php?id='
 
@@ -59,7 +59,7 @@ def downloadPdfs(ids):
                 a_tag = li.find('a')
                 if a_tag:
                     dir_name = a_tag.text.strip()
-                    dir_name = ''.join(e for e in dir_name if e.isalnum() or e.isspace() or e == ':').replace(' ', '_').replace(':', ' -')
+                    dir_name = ''.join(e for e in dir_name if e.isalnum() or e.isspace() or e == ':').replace(': ', '-').replace(' ', '_')
                     directories.append(dir_name)
         
         # Create the full directory path
@@ -83,3 +83,4 @@ def downloadPdfs(ids):
                 print(f'No PDF link found on page {url}')
         else:
             print(f'No navigation structure found on page {url}')
+downloadPdfs(getPdfIds(2, 3))
