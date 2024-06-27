@@ -132,12 +132,46 @@ def downloadPdfs(ids):
         else:
             print(f'No navigation structure found on page {url}')
             
-sub_pages = get_all_subpages(base_url, session)
-sectionIds = get_sectionids(sub_pages)
-print(f"Downloading from section of the following ids: {sectionIds}")
-for sectionId in sectionIds:
-    downloadPdfs(getPdfIds(2, sectionId))
-print("Done!")
+# sub_pages = get_all_subpages(base_url, session)
+# sectionIds = get_sectionids(sub_pages)
+# print(f"Downloading from section of the following ids: {sectionIds}")
+# for sectionId in sectionIds:
+#     downloadPdfs(getPdfIds(2, sectionId))
+# print("Done!")
 
-# print([getPdfIds(2, sectionid) for sectionid in get_sectionids(sub_pages)])
-print(get_all_subpages(session))
+sub_pages = get_all_subpages(session)
+print("Got all subpages!")
+
+pdfids = []
+
+null_pages = []
+
+for element in sub_pages:
+    course_id = element[0]
+    section_ids = get_sectionids(element[1])
+    for section_id in section_ids:
+        resource_ids = getPdfIds(course_id, section_id)
+        pdfids.extend(resource_ids)
+        
+        resource_count = len(resource_ids)
+
+        if resource_count == 0:
+            print("!!Null page found!!")
+            null_pages.append(f"https://my.integralmaths.org/course/view.php?id={course_id}&sectionid={section_id}")
+        else:
+            print(f"Added {len(resource_ids)} new resource IDs")
+
+print("All resource Ids extracted!")
+print("writing to txt file...")
+
+with open("rsrc_ids.txt", "w") as savefile:
+    for Id in pdfids:
+        savefile.write(Id)
+        savefile.write("\n")
+
+print("Done, now saving null pages...")
+
+with open("null_pages.txt", "w") as savefile:
+    for url in null_pages:
+        savefile.write(url)
+        savefile.write("\n")
