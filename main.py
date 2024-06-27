@@ -140,7 +140,7 @@ with open("rsrc_ids.txt", "r") as f:
         e = pdfId[:-1]
         parsedIds.append(e)
     print(parsedIds)
-    downloadPdfs(e)
+    #downloadPdfs(e)
 print("Done!")
 
 # sub_pages = get_all_subpages(session)
